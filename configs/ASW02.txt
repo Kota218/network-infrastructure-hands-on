@@ -1,0 +1,74 @@
+enable
+configure terminal
+
+hostname ASW02
+
+vlan 20
+ name SERVER
+vlan 30
+ name DEVELOPER
+vlan 99
+ name MANAGEMENT
+
+interface GigabitEthernet0/1
+ description TO_CORE01
+ switchport mode trunk
+ switchport trunk allowed vlan 20,30,99
+ no shutdown
+
+interface GigabitEthernet0/2
+ description TO_CORE02
+ switchport mode trunk
+ switchport trunk allowed vlan 20,30,99
+ no shutdown
+
+interface FastEthernet0/1
+ description DEV01
+ switchport mode access
+ switchport access vlan 30
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+
+interface FastEthernet0/2
+ description DB01
+ switchport mode access
+ switchport access vlan 20
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+
+interface FastEthernet0/3
+ description ADMIN01
+ switchport mode access
+ switchport access vlan 99
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ no shutdown
+
+interface Vlan99
+ description MANAGEMENT
+ ip address 192.168.99.5 255.255.255.0
+ no shutdown
+
+ip default-gateway 192.168.99.1
+
+ip domain-name lab.local
+username admin privilege 15 secret CHANGE_ME
+ip ssh version 2
+
+ip access-list standard SSH-MGMT
+ permit 192.168.99.0 0.0.0.255
+
+line vty 0 4
+ login local
+ transport input ssh
+ access-class SSH-MGMT in
+
+end
+write memory
+
+! One-time operation:
+! configure terminal
+! crypto key generate rsa
+! Use an appropriate key size for the target environment.
