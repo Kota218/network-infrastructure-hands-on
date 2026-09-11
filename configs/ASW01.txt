@@ -71,4 +71,5 @@ write memory
 ! One-time operation:
 ! configure terminal
 ! crypto key generate rsa
-! Use an appropriate key size for the target environment.
+! Enter an appropriate RSA key size.
+! ip ssh version 2
