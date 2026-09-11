@@ -218,15 +218,13 @@ line vty 0 4
 
 ## 13. PortFast / BPDU Guard
 
-ASW02の端末接続ポートに設定。
+ASW01 / ASW02の端末接続ポートに設定。
 
 ```cisco
 interface range FastEthernet0/1-3
  spanning-tree portfast
  spanning-tree bpduguard enable
 ```
-
-ASW01についても同様に端末接続ポートへ適用可能。
 
 ---
 
@@ -266,8 +264,8 @@ ASW01についても同様に端末接続ポートへ適用可能。
 | 8 | VLAN10 → WEB01 HTTP | Permit | OK |
 | 9 | VLAN10 → WEB01 ICMP | Deny | OK |
 | 10 | VLAN10 → DB01 | Deny | OK |
-| 11 | VLAN99 → CORE01 SSH | Permit | OK |
-| 12 | VLAN10 → CORE01 SSH | Deny | OK |
+| 11 | VLAN99 → CORE01 / CORE02 / ASW01 / ASW02 SSH | Permit | OK |
+| 12 | VLAN10 → CORE01 / ASW01 SSH | Deny | OK |
 | 13 | VLAN30 → CORE01 SSH | Deny | OK |
 
 ---
