@@ -197,25 +197,28 @@ show ip interface vlan 10
 ```text
 network-infrastructure-hands-on/
 ├── README.md
-├── docs/
-│   ├── parameter-sheet.md
-│   ├── test-results.md
-│   └── network-design.md
 ├── configs/
-│   ├── CORE01.txt
-│   ├── CORE02.txt
 │   ├── ASW01.txt
-│   └── ASW02.txt
-├── evidence/
-│   ├── hsrp-failover.png
-│   ├── stp-failover.png
-│   ├── acl-test.png
-│   └── ssh-test.png
-└── packet-tracer/
-    └── network-lab.pkt
+│   ├── ASW02.txt
+│   ├── CORE01.txt
+│   └── CORE02.txt
+├── docs/
+│   ├── network-design.md
+│   ├── parameter-sheet.md
+│   └── test-results.md
+└── evidence/
+    ├── network-topology.png
+    ├── acl-test.png
+    ├── acl-deny-test.png
+    ├── acl-hitcount.png
+    ├── hsrp-failover.png
+    ├── stp-failover.png
+    ├── failback.png
+    ├── ssh-vlan99-success.png
+    ├── ssh-vlan10-deny.png
+    ├── ssh-vlan30-deny.png
+    └── ssh-acl-hitcount.png
 ```
-
----
 
 ## 9. 学習・検証ポイント
 
