@@ -100,7 +100,17 @@ ACLはCORE01 / CORE02の両方に設定し、フェイルオーバー後も同�
 
 ### ACL通信制御確認
 
+HTTP通信許可:
+
 ![ACL通信制御確認](evidence/acl-test.png)
+
+WEB01 / DB01へのICMP拒否:
+
+![ACL拒否確認](evidence/acl-deny-test.png)
+
+ACL hit count確認:
+
+![ACL hit count確認](evidence/acl-hitcount.png)
 
 ---
 
