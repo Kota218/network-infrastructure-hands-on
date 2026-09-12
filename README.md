@@ -136,13 +136,21 @@ line vty 0 4
 - VLAN10 → CORE01 SSH：拒否
 - VLAN30 → CORE01 SSH：拒否
 
-![VLAN99からのSSH成功](evidence/ssh-vlan99-success.png)
+VLAN99からのSSH接続成功：
 
-![VLAN10からのSSH拒否](evidence/ssh-vlan10-deny.png)
+![VLAN99 SSH接続成功](evidence/ssh-vlan99-success.png)
 
-![VLAN30からのSSH拒否](evidence/ssh-vlan30-deny.png)
+VLAN10からのSSH接続拒否：
 
-![SSH管理ACL hit count](evidence/ssh-acl-hitcount.png)
+![VLAN10 SSH接続拒否](evidence/ssh-vlan10-deny.png)
+
+VLAN30からのSSH接続拒否：
+
+![VLAN30 SSH接続拒否](evidence/ssh-vlan30-deny.png)
+
+SSH管理ACLのヒットカウント確認：
+
+![SSH ACLヒットカウント確認](evidence/ssh-acl-hitcount.png)
 
 ---
 
