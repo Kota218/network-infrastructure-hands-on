@@ -130,11 +130,7 @@ line vty 0 4
  access-class SSH-MGMT in
 ```
 
-確認結果：
-
-- VLAN99 → CORE01 SSH：成功
-- VLAN10 → CORE01 SSH：拒否
-- VLAN30 → CORE01 SSH：拒否
+### SSH管理確認
 
 VLAN99からのSSH接続成功：
 
