@@ -1,4 +1,4 @@
-# Network Infrastructure Hands-on
+# ネットワークインフラ構築ハンズオン
 
 Cisco Packet Tracerを使用し、**冗長化・VLAN間ルーティング・ACL・SSH管理・障害試験**まで含めた小規模社内ネットワークを設計・構築したハンズオンです。
 
@@ -6,19 +6,11 @@ Cisco Packet Tracerを使用し、**冗長化・VLAN間ルーティング・ACL�
 
 ---
 
-## Documents
-
-- [Network Design](docs/network-design.md)
-- [Parameter Sheet](docs/parameter-sheet.md)
-- [Test Results](docs/test-results.md)
-
----
-
 ## 1. 構成概要
 
 ### ネットワーク機器
 
-| Hostname | Device | Role |
+| ホスト名 | 機種 | 役割 |
 |---|---|---|
 | CORE01 | Catalyst 3650 | L3 Core Switch |
 | CORE02 | Catalyst 3650 | L3 Core Switch |
@@ -27,7 +19,7 @@ Cisco Packet Tracerを使用し、**冗長化・VLAN間ルーティング・ACL�
 
 ### VLAN
 
-| VLAN | Name | Purpose | Network |
+| VLAN | 名前 | 用途 | ネットワーク |
 |---:|---|---|---|
 | 10 | PC | 一般社員端末 | 192.168.10.0/24 |
 | 20 | SERVER | サーバ | 192.168.20.0/24 |
@@ -40,6 +32,7 @@ Cisco Packet Tracerを使用し、**冗長化・VLAN間ルーティング・ACL�
 
 - VLAN / Access Port / Trunk
 - SVIによるInter-VLAN Routing
+- `ip routing`
 - HSRPによるデフォルトゲートウェイ冗長化
 - HSRP Priority / Preempt
 - STPによるL2ループ防止・冗長経路制御
@@ -65,11 +58,22 @@ Cisco Packet Tracerを使用し、**冗長化・VLAN間ルーティング・ACL�
 | 30 | CORE01 | CORE01 |
 | 99 | CORE02 | CORE02 |
 
+### HSRP仮想IP
+
+| VLAN | Virtual Gateway |
+|---:|---|
+| 10 | 192.168.10.1 |
+| 20 | 192.168.20.1 |
+| 30 | 192.168.30.1 |
+| 99 | 192.168.99.1 |
+
 ---
 
 ## 4. 通信制御
 
-VLAN10からの通信は以下の要件で制御しています。
+### VLAN10
+
+一般社員端末からの通信について、以下の要件をACLで実装しています。
 
 - WEB01へのHTTP通信：許可
 - WEB01へのHTTP以外：拒否
@@ -84,13 +88,13 @@ ip access-list extended VLAN10-IN
  permit ip 192.168.10.0 0.0.0.255 any
 ```
 
-![ACL Test](evidence/acl-test.png)
+ACLはCORE01 / CORE02の両方に設定し、フェイルオーバー後も同じ通信制御を維持します。
 
 ---
 
 ## 5. SSH管理
 
-CORE01 / CORE02 / ASW01 / ASW02へのSSH接続は、管理VLANであるVLAN99からのみ許可しています。
+NW機器へのSSH接続は、管理VLANであるVLAN99からのみ許可しています。
 
 ```cisco
 ip access-list standard SSH-MGMT
@@ -104,62 +108,48 @@ line vty 0 4
  access-class SSH-MGMT in
 ```
 
-確認結果:
+確認結果：
 
-- ADMIN01 (VLAN99) → 4台すべてSSH成功
-- PC01 (VLAN10) → SSH拒否
-- DEV01 (VLAN30) → SSH拒否
-
-### VLAN99からのSSH成功
-
-![SSH VLAN99 Success](evidence/ssh-vlan99-success.png)
-
-### VLAN10からのSSH拒否
-
-![SSH VLAN10 Deny](evidence/ssh-vlan10-deny.png)
-
-### VLAN30からのSSH拒否
-
-![SSH VLAN30 Deny](evidence/ssh-vlan30-deny.png)
-
-### SSH管理ACL hit count
-
-![SSH ACL Hit Count](evidence/ssh-acl-hitcount.png)
+- VLAN99 → CORE01 SSH：成功
+- VLAN10 → CORE01 SSH：拒否
+- VLAN30 → CORE01 SSH：拒否
 
 ---
 
 ## 6. 障害試験
 
-### STPリンク障害
+### CORE01 - ASW01間リンク障害
 
-CORE01 - ASW01間リンクを停止し、ASW01のRoot PortがCORE02側へ切り替わることを確認しました。
+CORE01側のアップリンクをshutdownし、STPによる経路切替を確認しました。
 
-![STP Failover](evidence/stp-failover.png)
+障害前：
 
-### HSRP / CORE障害
+```text
+ASW01 Gi0/1 -> Root FWD
+ASW01 Gi0/2 -> Altn BLK
+```
 
-CORE01を停止し、VLAN10 / VLAN30のHSRP ActiveがCORE02へ切り替わることを確認しました。
+障害後：
 
-![HSRP Failover](evidence/hsrp-failover.png)
+```text
+ASW01 Gi0/2 -> Root FWD
+```
 
-### フェイルバック
+収束後、通信が復旧することを確認しました。
 
-CORE01復旧後、HSRP PreemptおよびSTPにより元の設計状態へ戻ることを確認しました。
+### CORE01本体障害
 
-![Failback](evidence/failback.png)
+CORE01の電源を停止し、以下を確認しました。
+
+- VLAN10 / VLAN30のHSRP ActiveがCORE02へ切替
+- VLAN10 / VLAN30のSTP RootがCORE02へ切替
+- 収束後にVLAN間通信が復旧
+- CORE01復旧後、`preempt` により元のHSRP Activeへ復帰
+- STPも元のRoot構成へ復帰
 
 ---
 
-## 7. Config Files
-
-- [CORE01](configs/CORE01.txt)
-- [CORE02](configs/CORE02.txt)
-- [ASW01](configs/ASW01.txt)
-- [ASW02](configs/ASW02.txt)
-
----
-
-## 8. 主な確認コマンド
+## 7. 主な確認コマンド
 
 ```cisco
 show vlan brief
@@ -171,12 +161,12 @@ show spanning-tree vlan 20
 show spanning-tree vlan 30
 show spanning-tree vlan 99
 show access-lists
-show ip ssh
+show ip interface vlan 10
 ```
 
 ---
 
-## 9. Repository Structure
+## 8. リポジトリ構成
 
 ```text
 network-infrastructure-hands-on/
@@ -190,33 +180,32 @@ network-infrastructure-hands-on/
 │   ├── CORE02.txt
 │   ├── ASW01.txt
 │   └── ASW02.txt
-└── evidence/
-    ├── acl-test.png
-    ├── stp-failover.png
-    ├── hsrp-failover.png
-    ├── failback.png
-    ├── ssh-vlan99-success.png
-    ├── ssh-vlan10-deny.png
-    ├── ssh-vlan30-deny.png
-    └── ssh-acl-hitcount.png
+├── evidence/
+│   ├── hsrp-failover.png
+│   ├── stp-failover.png
+│   ├── acl-test.png
+│   └── ssh-test.png
+└── packet-tracer/
+    └── network-lab.pkt
 ```
 
 ---
 
-## 10. 学習・検証ポイント
+## 9. 学習・検証ポイント
 
-- 要件からVLAN / IP / ポート構成を設計
-- HSRPとSTPの役割を分離して理解
-- HSRP ActiveとSTP Rootを揃えた経路設計
-- ACLの評価順序と暗黙のdenyを確認
-- SSH管理元をVLAN99に限定
-- 端末ポートにPortFast / BPDU Guardを設定
-- リンク障害・CORE障害・復旧まで一連で検証
-- `show` コマンドとACL hit countで設定結果を確認
+このハンズオンでは、設定コマンドの投入だけでなく、以下を意識しています。
+
+- 要件からVLAN / IP / ポート構成を設計する
+- 冗長化対象を明確にする
+- HSRPとSTPの役割を分けて理解する
+- 障害時にどの経路へ切り替わるか確認する
+- ACLを上から順に評価し、暗黙のdenyを考慮する
+- `show` コマンドやACL hit countを使って設定結果を確認する
+- 障害発生から復旧までを一連の試験として確認する
 
 ---
 
-## Notes
+## 10. 補足
 
 このリポジトリは学習用の検証環境です。
 
