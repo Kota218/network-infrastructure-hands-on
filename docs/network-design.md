@@ -35,27 +35,43 @@ Cisco Packet Tracerを使用し、小規模社内ネットワークを想定し�
 
 ## 3. 論理構成
 
-```text
-                     +----------------+
-                     |     CORE01     |
-                     | Catalyst 3650  |
-                     +--------+-------+
-                         |    |    |
-                         |    |    |
-             +-----------+    |    +-----------+
-             |                |                |
-             |                |                |
-         +---+---+         CORE間          +---+---+
-         | ASW01 |<----------------------->| CORE02|
-         +---+---+                         +---+---+
-             |                                 |
-             |                                 |
-         PC01/PC02                           ASW02
-         WEB01                               / |  \
-                                          DEV DB ADMIN
+```mermaid
+flowchart TB
+    CORE01["CORE01<br/>Catalyst 3650"]
+    CORE02["CORE02<br/>Catalyst 3650"]
+
+    ASW01["ASW01"]
+    ASW02["ASW02"]
+
+    USERS["PC01 / PC02 / WEB01"]
+    ASW02_DEVICES["DEV01 / DB01 / ADMIN01"]
+
+    CORE01 <-->|"CORE間 Trunk<br/>VLAN 10,20,30,99"| CORE02
+
+    CORE01 <-->|"Trunk<br/>VLAN 10,20,99"| ASW01
+    CORE02 <-->|"Trunk<br/>VLAN 10,20,99"| ASW01
+
+    CORE01 <-->|"Trunk<br/>VLAN 20,30,99"| ASW02
+    CORE02 <-->|"Trunk<br/>VLAN 20,30,99"| ASW02
+
+    ASW01 --- USERS
+    ASW02 --- ASW02_DEVICES
 ```
 
-実際にはASW01 / ASW02は両COREへ接続し、L2冗長経路を持つ。
+ASW01 / ASW02はそれぞれCORE01 / CORE02の両方へ接続し、L2経路を冗長化する。
+
+CORE01 / CORE02間もTrunk接続とし、VLAN 10 / 20 / 30 / 99を通過させる。
+
+### 物理接続
+
+| 接続元 | ポート | 接続先 | ポート | 用途 |
+|---|---|---|---|---|
+| CORE01 | Gi1/0/1 | CORE02 | Gi1/0/1 | CORE間Trunk |
+| ASW01 | Gi0/1 | CORE01 | Gi1/0/2 | Trunk |
+| ASW01 | Gi0/2 | CORE02 | Gi1/0/2 | Trunk |
+| ASW02 | Gi0/1 | CORE01 | Gi1/0/3 | Trunk |
+| ASW02 | Gi0/2 | CORE02 | Gi1/0/3 | Trunk |
+
 
 ---
 
