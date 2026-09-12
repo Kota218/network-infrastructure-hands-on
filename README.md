@@ -92,6 +92,12 @@ ACLはCORE01 / CORE02の両方に設定し、フェイルオーバー後も同�
 
 ---
 
+### ACL通信制御確認
+
+![ACL通信制御確認](evidence/acl-test.png)
+
+---
+
 ## 5. SSH管理
 
 NW機器へのSSH接続は、管理VLANであるVLAN99からのみ許可しています。
@@ -113,6 +119,14 @@ line vty 0 4
 - VLAN99 → CORE01 SSH：成功
 - VLAN10 → CORE01 SSH：拒否
 - VLAN30 → CORE01 SSH：拒否
+
+![VLAN99からのSSH成功](evidence/ssh-vlan99-success.png)
+
+![VLAN10からのSSH拒否](evidence/ssh-vlan10-deny.png)
+
+![VLAN30からのSSH拒否](evidence/ssh-vlan30-deny.png)
+
+![SSH管理ACL hit count](evidence/ssh-acl-hitcount.png)
 
 ---
 
@@ -137,6 +151,8 @@ ASW01 Gi0/2 -> Root FWD
 
 収束後、通信が復旧することを確認しました。
 
+![STPフェイルオーバー確認](evidence/stp-failover.png)
+
 ### CORE01本体障害
 
 CORE01の電源を停止し、以下を確認しました。
@@ -146,6 +162,10 @@ CORE01の電源を停止し、以下を確認しました。
 - 収束後にVLAN間通信が復旧
 - CORE01復旧後、`preempt` により元のHSRP Activeへ復帰
 - STPも元のRoot構成へ復帰
+
+![HSRPフェイルオーバー確認](evidence/hsrp-failover.png)
+
+![フェイルバック確認](evidence/failback.png)
 
 ---
 
