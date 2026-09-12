@@ -102,11 +102,12 @@ show access-lists SSH-MGMT
 
 ---
 
-## 5. STPリンク障害試験
+## 5. STPリンク障害試験（VLAN10）
 
 ### 対象
 
-CORE01 `Gi1/0/2` - ASW01 `Gi0/1`
+- VLAN: VLAN10
+- Link: CORE01 `Gi1/0/2` - ASW01 `Gi0/1`
 
 ### 正常時
 

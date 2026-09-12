@@ -298,7 +298,9 @@ spanning-tree bpduguard enable
 
 ## 13. 障害時の動作設計
 
-### CORE01 - ASW01リンク障害
+### CORE01 - ASW01リンク障害（VLAN10）
+
+VLAN10のSTP経路を対象とする。
 
 正常時:
 
