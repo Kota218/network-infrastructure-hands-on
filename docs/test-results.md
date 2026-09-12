@@ -54,6 +54,20 @@ show ip interface vlan 10
 - WEB01 / DB01へのICMPは拒否
 - ACL hit countが試験通信に応じて増加することを確認
 
+### Evidence
+
+HTTP許可:
+
+![ACL HTTP Permit](../evidence/acl-test.png)
+
+WEB01 / DB01へのICMP拒否:
+
+![ACL Deny Test](../evidence/acl-deny-test.png)
+
+ACL hit count:
+
+![ACL Hit Count](../evidence/acl-hitcount.png)
+
 ---
 
 ## 4. SSH管理アクセス試験
@@ -247,6 +261,8 @@ This bridge is the root
 ```text
 evidence/
 ├── acl-test.png
+├── acl-deny-test.png
+├── acl-hitcount.png
 ├── stp-failover.png
 ├── hsrp-failover.png
 ├── failback.png
